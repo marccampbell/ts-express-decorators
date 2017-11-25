@@ -10,7 +10,7 @@ import {$log} from "ts-log-debug";
 import {ServerSettingsProvider} from "../../config";
 import {IServerSettings} from "../../config/interfaces/IServerSettings";
 import {ServerSettingsService} from "../../config/services/ServerSettingsService";
-import {Deprecated, ExpressApplication} from "../../core";
+import {ExpressApplication} from "../../core";
 import {HttpServer} from "../../core/services/HttpServer";
 import {HttpsServer} from "../../core/services/HttpsServer";
 import {isArray, isClass, isString} from "../../core/utils";
@@ -238,12 +238,6 @@ export abstract class ServerLoader implements IServerLifecycle {
     }
 
     /**
-     *
-     * @param key
-     */
-    private hasHook = (key: string) => !!(this as any)[key];
-
-    /**
      * Start the express server.
      * @returns {Promise<any>|Promise}
      */
@@ -331,51 +325,6 @@ export abstract class ServerLoader implements IServerLifecycle {
     }
 
     /**
-     * Set the port for http server.
-     * @deprected
-     * @param port
-     * @returns {ServerLoader}
-     */
-    @Deprecated("ServerLoader.setHttpPort() is deprecated. Use ServerLoader.settings.port instead of.")
-    /* istanbul ignore next */
-    public setHttpPort(port: number | string): ServerLoader {
-
-        this._settings.httpPort = port;
-
-        return this;
-    }
-
-    /**
-     * Set the port for https server.
-     * @deprecated
-     * @param port
-     * @returns {ServerLoader}
-     */
-    @Deprecated("ServerLoader.setHttpsPort() is deprecated. Use ServerLoader.settings.httpsPort instead of.")
-    /* istanbul ignore next */
-    public setHttpsPort(port: number | string): ServerLoader {
-
-        this._settings.httpsPort = port;
-
-        return this;
-    }
-
-    /**
-     * Change the global endpoint path.
-     * @deprecated
-     * @param endpoint
-     * @returns {ServerLoader}
-     */
-    @Deprecated("ServerLoader.setEndpoint() is deprecated. Use ServerLoader.mount() instead of. See https://goo.gl/6MPr6q.")
-    /* istanbul ignore next */
-    public setEndpoint(endpoint: string): ServerLoader {
-
-        this._settings.endpoint = endpoint;
-
-        return this;
-    }
-
-    /**
      * Scan and imports all files matching the pattern. See the document on the [Glob](https://www.npmjs.com/package/glob)
      * pattern for more information.
      *
@@ -409,7 +358,7 @@ export abstract class ServerLoader implements IServerLifecycle {
      * @param endpoint
      * @returns {ServerLoader}
      */
-    public scan(path: string, endpoint: string = this._settings.endpoint) {
+    public scan(path: string, endpoint?: string): ServerLoader {
 
         path = Path.resolve(path);
 
@@ -475,16 +424,6 @@ export abstract class ServerLoader implements IServerLifecycle {
     }
 
     /**
-     * ServerLoader.onError() is deprecated. Use your own middleware instead of.
-     * @deprecated
-     */
-    @Deprecated("ServerLoader.onError() is deprecated. Use your own middleware instead of.")
-    /* istanbul ignore next */
-    public onError() {
-
-    }
-
-    /**
      * Mount all controllers files that match with `globPattern` ([Glob Pattern](https://www.npmjs.com/package/glob))
      * under the endpoint. See [Versioning Rest API](docs/server-loader/versioning.md) for more informations.
      * @param endpoint
@@ -525,12 +464,6 @@ export abstract class ServerLoader implements IServerLifecycle {
         await this.callHook("$afterRoutesInit", undefined, this.expressApp);
 
         // Import the globalErrorHandler
-
-        /* istanbul ignore next */
-        if (this.hasHook("$onError")) {
-            this.use((this as any)["$onError"].bind(this));
-        }
-
         this.use(GlobalErrorHandlerMiddleware);
     }
 
