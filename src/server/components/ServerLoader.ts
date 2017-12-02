@@ -86,7 +86,6 @@ export abstract class ServerLoader implements IServerLifecycle {
     constructor() {
 
         this._settings = InjectorService.get<ServerSettingsProvider>(ServerSettingsService);
-        this._settings.authentification = (<any>this).$onAuth || this._settings.authentification;
 
         // Configure the ExpressApplication factory.
         InjectorService.factory(ExpressApplication, this.expressApp);
@@ -94,6 +93,10 @@ export abstract class ServerLoader implements IServerLifecycle {
         InjectorService.factory(HttpsServer, {get: () => this.httpsServer});
 
         const settings = ServerSettingsProvider.getMetadata(this);
+
+        if ((this as any).$onAuth) {
+            console.warn("The $onAuth hooks is removed. Use OverrideMiddleware method instead of. See https://goo.gl/fufBTE.");
+        }
 
         if (settings) {
             $log.debug("Autoload configuration from metadata");
