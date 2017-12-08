@@ -4,6 +4,7 @@
 /** */
 
 import {globalServerSettings} from "../config";
+import {HttpServer, HttpsServer} from "../core";
 import {Env} from "../core/interfaces";
 import {ExpressApplication} from "../core/services/ExpressApplication";
 import {InjectorService} from "../di/services/InjectorService";
@@ -16,6 +17,8 @@ export function loadInjector() {
             get: () => (app)
         };
         InjectorService.set(ExpressApplication, app);
+        InjectorService.set(HttpsServer, {});
+        InjectorService.set(HttpServer, {});
         globalServerSettings.env = Env.TEST;
     }
 
